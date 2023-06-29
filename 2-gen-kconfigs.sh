@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 source hosts.sh
 cd crts_cfgs
 

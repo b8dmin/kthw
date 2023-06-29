@@ -1,21 +1,19 @@
-#!/usr/bin/bash
-
 source hosts.sh
 
 for idx in $(seq 0 $((${#WORKERS_HN[@]} - 1))); do
   echo wr_${idx} - ${WORKERS_HN[idx]}
-  cat <<EOD | ssh root@${WORKERS_HN[idx]}.${DOMAIN} bash
+  cat <<EOD | echo
 sudo apt-get update
 sudo apt-get -y install socat conntrack ipset
 
 wget -q --show-progress --https-only --timestamping \
-  https://github.com/kubernetes-incubator/cri-tools/releases/download/v1.0.0-beta.0/crictl-v1.0.0-beta.0-linux-amd64.tar.gz \
+  https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.27.0/crictl-v1.27.0-linux-amd64.tar.gz \
   https://github.com/opencontainers/runc/releases/download/v1.1.7/runc.amd64 \
-  https://github.com/containernetworking/plugins/releases/download/v0.9.1/cni-plugins-linux-amd64-v0.9.1.tgz \
-  https://github.com/containerd/containerd/releases/download/v1.4.4/containerd-1.4.4-linux-amd64.tar.gz \
-  https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kubectl \
-  https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kube-proxy \
-  https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kubelet
+  https://github.com/containernetworking/plugins/releases/download/v1.3.0/cni-plugins-linux-amd64-v1.3.0.tgz \
+  https://github.com/containerd/containerd/releases/download/v1.7.2/containerd-1.7.2-linux-amd64.tar.gz \
+  https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kubectl \
+  https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kube-proxy \
+  https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kubelet
 
 sudo mkdir -p \
   /etc/cni/net.d \
@@ -28,14 +26,14 @@ sudo mkdir -p \
 chmod +x kubectl kube-proxy kubelet runc.amd64 
 sudo mv runc.amd64 runc
 sudo mv kubectl kube-proxy kubelet runc  /usr/local/bin/
-sudo tar -xvf crictl-v1.0.0-beta.0-linux-amd64.tar.gz -C /usr/local/bin/
-sudo tar -xvf cni-plugins-linux-amd64-v0.9.1.tgz -C /opt/cni/bin/
+sudo tar -xvf crictl-v1.27.0-linux-amd64.tar.gz -C /usr/local/bin/
+sudo tar -xvf cni-plugins-linux-amd64-v1.3.0.tgz -C /opt/cni/bin/
 
 mkdir containerd
-sudo tar -xvf containerd-1.4.4-linux-amd64.tar.gz -C containerd
+sudo tar -xvf containerd-1.7.2-linux-amd64.tar.gz -C containerd
 sudo mv containerd/bin/* /bin/
 
-suro rm -rf containerd crictl-v1.0.0-beta.0-linux-amd64.tar.gz cni-plugins-linux-amd64-v0.9.1.tgz containerd-1.4.4-linux-amd64.tar.gz
+suro rm -rf containerd crictl-v1.27.0-linux-amd64.tar.gz cni-plugins-linux-amd64-v1.3.0.tgz containerd-1.7.2-linux-amd64.tar.gz
 
 sudo mkdir -p /etc/containerd/
 
@@ -118,11 +116,8 @@ Requires=containerd.service
 [Service]
 ExecStart=/usr/local/bin/kubelet \\\\
   --config=/var/lib/kubelet/kubelet-config.yaml \\\\
-  --container-runtime=remote \\\\
   --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \\\\
-  --image-pull-progress-deadline=2m \\\\
   --kubeconfig=/var/lib/kubelet/kubeconfig \\\\
-  --network-plugin=cni \\\\
   --register-node=true \\\\
   --v=2 \\\\
   --hostname-override=${WORKERS_HN[idx]}.${DOMAIN}

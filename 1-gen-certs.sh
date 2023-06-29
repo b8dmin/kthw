@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 set +x
 
 source hosts.sh

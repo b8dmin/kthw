@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 cd crts_cfgs
 
 ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64)

@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 source hosts.sh
 
 UPSTREAMS="        server ${CPLAINS_IPS[0]}:6443;"

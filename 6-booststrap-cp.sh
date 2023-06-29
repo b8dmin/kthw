@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 source hosts.sh
 
 for idx in $(seq 0 $((${#CPLAINS_HN[@]} - 1))); do
@@ -7,10 +5,10 @@ for idx in $(seq 0 $((${#CPLAINS_HN[@]} - 1))); do
   cat <<EOD | ssh root@${CPLAINS_HN[idx]}.${DOMAIN} bash
     sudo mkdir -p /etc/kubernetes/config
     wget -q --show-progress --https-only --timestamping \
-        "https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kube-apiserver" \
-        "https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kube-controller-manager" \
-        "https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kube-scheduler" \
-        "https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kubectl"
+        "https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kube-apiserver" \
+        "https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kube-controller-manager" \
+        "https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kube-scheduler" \
+        "https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kubectl"
     chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
     sudo mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
 EOD
@@ -52,7 +50,6 @@ ExecStart=/usr/local/bin/kube-apiserver \\\\
   --bind-address=0.0.0.0 \\\\
   --client-ca-file=/var/lib/kubernetes/ca.pem \\\\
   --enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \\\\
-  --enable-swagger-ui=true \\\\
   --etcd-cafile=/var/lib/kubernetes/ca.pem \\\\
   --etcd-certfile=/var/lib/kubernetes/kubernetes.pem \\\\
   --etcd-keyfile=/var/lib/kubernetes/kubernetes-key.pem \\\\
@@ -62,7 +59,6 @@ ExecStart=/usr/local/bin/kube-apiserver \\\\
   --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \\\\
   --kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem \\\\
   --kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem \\\\
-  --kubelet-https=true \\\\
   --runtime-config=api/all=true \\\\
   --service-account-key-file=/var/lib/kubernetes/service-account.pem \\\\
   --service-account-signing-key-file=/var/lib/kubernetes/service-account-key.pem \\\\
@@ -100,7 +96,7 @@ Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
 ExecStart=/usr/local/bin/kube-controller-manager \\\\
-  --address=0.0.0.0 \\\\
+  --bind-address=0.0.0.0 \\\\
   --cluster-cidr=10.200.0.0/16 \\\\
   --cluster-name=kubernetes \\\\
   --cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \\\\
@@ -133,7 +129,7 @@ cd /root/k8s
 sudo cp kube-scheduler.kubeconfig /var/lib/kubernetes/
 
 cat << EOF | sudo tee /etc/kubernetes/config/kube-scheduler.yaml
-apiVersion: kubescheduler.config.k8s.io/v1beta1
+apiVersion: kubescheduler.config.k8s.io/v1
 kind: KubeSchedulerConfiguration
 clientConnection:
   kubeconfig: "/var/lib/kubernetes/kube-scheduler.kubeconfig"

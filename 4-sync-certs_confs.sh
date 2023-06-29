@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-
-source hosts.sh
+#!source hosts.sh
 set +x
 # controll plains
 cp_files=(

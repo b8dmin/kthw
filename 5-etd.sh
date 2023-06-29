@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 source hosts.sh
 
 INITIAL_CLUSTER=${CPLAINS_HN[0]}.${DOMAIN}=https://${CPLAINS_IPS[0]}:2380
@@ -12,9 +10,9 @@ done
 for idx in $(seq 0 $((${#CPLAINS_HN[@]} - 1))); do
   echo cp_${idx} - ${CPLAINS_HN[idx]}
   cat <<EOD | ssh root@${CPLAINS_HN[idx]}.${DOMAIN} bash
-wget --show-progress  https://github.com/coreos/etcd/releases/download/v3.4.26/etcd-v3.4.26-linux-amd64.tar.gz
-tar -xf etcd-v3.4.26-linux-amd64.tar.gz
-mv etcd-v3.4.26-linux-amd64/etcd* /usr/local/bin/
+wget --show-progress  https://github.com/coreos/etcd/releases/download/v3.5.9/etcd-v3.5.9-linux-amd64.tar.gz
+tar -xf etcd-v3.5.9-linux-amd64.tar.gz
+mv etcd-v3.5.9-linux-amd64/etcd* /usr/local/bin/
 mkdir -p /etc/etcd /var/lib/etcd
 cd /root/k8s
 cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
