@@ -2,7 +2,7 @@ source hosts.sh
 
 for idx in $(seq 0 $((${#WORKERS_HN[@]} - 1))); do
   echo wr_${idx} - ${WORKERS_HN[idx]}
-  cat <<EOD | echo
+  cat <<EOD | ssh root@${WORKERS_HN[idx]}.${DOMAIN} bash
 sudo apt-get update
 sudo apt-get -y install socat conntrack ipset
 
