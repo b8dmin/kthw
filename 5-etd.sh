@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 source hosts.sh
 
 INITIAL_CLUSTER=${CPLAINS_HN[0]}.${DOMAIN}=https://${CPLAINS_IPS[0]}:2380

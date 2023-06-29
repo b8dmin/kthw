@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 source hosts.sh
 
 cat <<EOD | ssh root@${CPLAINS_HN[0]}.${DOMAIN} bash

@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 source hosts.sh
 
 for idx in $(seq 0 $((${#CPLAINS_HN[@]} - 1))); do
