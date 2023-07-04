@@ -13,7 +13,9 @@ wget -q --show-progress --https-only --timestamping \
   https://github.com/containerd/containerd/releases/download/v1.7.2/containerd-1.7.2-linux-amd64.tar.gz \
   https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kubectl \
   https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kube-proxy \
-  https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kubelet
+  https://storage.googleapis.com/kubernetes-release/release/v1.27.3/bin/linux/amd64/kubelet \
+  https://storage.googleapis.com/gvisor/releases/release/latest/x86_64/runsc \
+  https://storage.googleapis.com/gvisor/releases/release/latest/x86_64/containerd-shim-runsc-v1
 
 sudo mkdir -p \
   /etc/cni/net.d \
@@ -23,9 +25,9 @@ sudo mkdir -p \
   /var/lib/kubernetes \
   /var/run/kubernetes
 
-chmod +x kubectl kube-proxy kubelet runc.amd64 
+chmod +x kubectl kube-proxy kubelet runc.amd64 runsc containerd-shim-runsc-v1
 sudo mv runc.amd64 runc
-sudo mv kubectl kube-proxy kubelet runc  /usr/local/bin/
+sudo mv kubectl kube-proxy kubelet runc runsc containerd-shim-runsc-v1 /usr/local/bin/
 sudo tar -xvf crictl-v1.27.0-linux-amd64.tar.gz -C /usr/local/bin/
 sudo tar -xvf cni-plugins-linux-amd64-v1.3.0.tgz -C /opt/cni/bin/
 
@@ -38,16 +40,11 @@ suro rm -rf containerd crictl-v1.27.0-linux-amd64.tar.gz cni-plugins-linux-amd64
 sudo mkdir -p /etc/containerd/
 
 cat << EOF | sudo tee /etc/containerd/config.toml
-[plugins]
-  [plugins.cri.containerd]
-    snapshotter = "overlayfs"
-    [plugins."io.containerd.runc.v2"]
-      runtime_type = "io.containerd.runc.v2"
-      runtime_engine = "/usr/local/bin/runc"
-    #[plugins.cri.containerd.untrusted_workload_runtime]
-    #  runtime_type = "io.containerd.runtime.v1.linux"
-    #  runtime_engine = "/usr/local/bin/runsc"
-    #  runtime_root = "/run/containerd/runsc"
+version = 2
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+  runtime_type = "io.containerd.runc.v2"
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runsc]
+  runtime_type = "io.containerd.runsc.v1"
 EOF
 
 # Create the containerd unit file:
